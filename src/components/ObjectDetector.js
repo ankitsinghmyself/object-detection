@@ -139,24 +139,29 @@ const ObjectDetector = () => {
             }}
           >
             <button onClick={handleStart}>Start Detection</button>
-             
-          <div className="responsive-image-container">
-    <img src="/img/imgAi.webp" alt="Home Image AI" className="responsive-image" />
-</div>
+
+            <div className="responsive-image-container">
+              <img
+                src="/img/imgAi.webp"
+                alt="Home Image AI"
+                className="responsive-image"
+              />
+            </div>
           </div>
-         
         </div>
       ) : (
         <div>
-          <div  style={{
+          <div
+            style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-            }}>
+            }}
+          >
             <h3>Detected Objects:</h3>
             <ul>
               {detectedObjects.map((obj, index) => (
-                <li key={index}>{obj}</li> 
+                <li key={index}>{obj}</li>
               ))}
             </ul>
           </div>
@@ -180,7 +185,6 @@ const ObjectDetector = () => {
             ></video>
             <canvas ref={canvasRef} width="640" height="480"></canvas>
           </div>
-         
         </div>
       )}
     </div>
