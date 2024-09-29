@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as tf from "@tensorflow/tfjs";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
-
+import "../styles/App.css";
 const ObjectDetector = () => {
   const [model, setModel] = useState(null);
-  const [isStarted, setIsStarted] = useState(false);
-  const [deviceId, setDeviceId] = useState(null); // State for selected camera device ID
+  const [isStarted, setIsStarted] = useState(false); // State to track if the app has started
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const spokenObjects = useRef(new Set());
-  const [videoDevices, setVideoDevices] = useState([]);
 
   useEffect(() => {
     const loadModel = async () => {
@@ -18,16 +16,8 @@ const ObjectDetector = () => {
       setModel(loadedModel);
     };
 
+    // Load the model on initial render
     loadModel();
-    
-    // Get available video devices
-    navigator.mediaDevices.enumerateDevices().then(devices => {
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
-      setVideoDevices(videoDevices);
-      if (videoDevices.length > 0) {
-        setDeviceId(videoDevices[0].deviceId); // Select the first camera by default
-      }
-    });
 
     return () => {
       if (videoRef.current && videoRef.current.srcObject) {
@@ -36,14 +26,16 @@ const ObjectDetector = () => {
     };
   }, []);
 
-  const startVideo = async () => {
+  const startVideo = async (facingMode = "user") => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { deviceId: deviceId ? { exact: deviceId } : undefined }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: facingMode },
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play().catch((err) => console.error("Error playing video:", err));
+        videoRef.current
+          .play()
+          .catch((err) => console.error("Error playing video:", err));
       }
     } catch (error) {
       console.error("Error accessing webcam:", error);
@@ -53,7 +45,10 @@ const ObjectDetector = () => {
   const detectObjects = async () => {
     if (model && videoRef.current && videoRef.current.readyState >= 2) {
       const predictions = await model.detect(videoRef.current);
-      const filteredPredictions = predictions.filter(prediction => prediction.score >= 0.5);
+      const filteredPredictions = predictions.filter(
+        (prediction) => prediction.score >= 0.5
+      );
+
       drawPredictions(filteredPredictions);
     }
     requestAnimationFrame(detectObjects);
@@ -63,58 +58,70 @@ const ObjectDetector = () => {
     const ctx = canvasRef.current.getContext("2d");
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-    const videoWidth = videoRef.current.videoWidth || 640;
-    const videoHeight = videoRef.current.videoHeight || 480;
+    const videoWidth = videoRef.current.videoWidth || 640; // Fallback if not loaded
+    const videoHeight = videoRef.current.videoHeight || 480; // Fallback if not loaded
 
+    // Set the canvas size to match video size
     canvasRef.current.width = videoWidth;
     canvasRef.current.height = videoHeight;
 
+    // Create a new set to track spoken objects for this detection cycle
     const currentSpokenObjects = new Set();
 
     predictions.forEach((prediction) => {
       const [x, y, width, height] = prediction.bbox;
 
+      // Draw the bounding box
       ctx.beginPath();
-      ctx.rect(x, y, width, height);
+      ctx.rect(x, y, width, height); // Use original coordinates as canvas matches video
       ctx.lineWidth = 2;
       ctx.strokeStyle = "red";
       ctx.fillStyle = "red";
       ctx.stroke();
       ctx.fillText(prediction.class, x, y > 10 ? y - 5 : 10);
 
+      // Add the predicted class to current spoken objects
       currentSpokenObjects.add(prediction.class);
     });
 
+    // Speak objects that haven't been spoken in this cycle
     currentSpokenObjects.forEach((obj) => speak(obj));
   };
 
   const handleStart = () => {
-    setIsStarted(true); 
-    startVideo(); 
-    detectObjects(); 
+    setIsStarted(true);
+    startVideo();
+    detectObjects();
   };
 
   const speak = (text) => {
     text = `There is a ${text}`;
     if (!spokenObjects.current.has(text)) {
-      spokenObjects.current.add(text);
+      spokenObjects.current.add(text); // Mark this object as spoken
+
       if (window.speechSynthesis) {
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        window.speechSynthesis.speak(utterance);
+        utterance.lang = "en-US"; // Set language
 
+        // Check if speech synthesis is supported
+        if (!window.speechSynthesis.speaking) {
+          window.speechSynthesis.speak(utterance);
+        }
+
+        // Optionally, reset spoken objects after a certain duration
         setTimeout(() => {
           spokenObjects.current.delete(text);
-        }, 5000);
+        }, 5000); // Wait for 5 seconds before allowing it to be spoken again
       }
     }
   };
 
   const switchCamera = () => {
-    const currentIndex = videoDevices.findIndex(device => device.deviceId === deviceId);
-    const nextIndex = (currentIndex + 1) % videoDevices.length;
-    setDeviceId(videoDevices[nextIndex].deviceId);
-    startVideo(); // Restart video with new device
+    const currentFacingMode = videoRef.current.srcObject
+      ?.getVideoTracks()[0]
+      ?.getSettings()?.facingMode;
+    const newFacingMode = currentFacingMode === "user" ? "environment" : "user";
+    startVideo(newFacingMode);
   };
 
   return (
@@ -126,7 +133,15 @@ const ObjectDetector = () => {
             Click the button below to start the application and enable webcam
             access.
           </p>
-          <button onClick={handleStart}>Start Detection</button>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <button onClick={handleStart}>Start Detection</button>
+          </div>
         </div>
       ) : (
         <div>
@@ -141,8 +156,16 @@ const ObjectDetector = () => {
             ></video>
             <canvas ref={canvasRef} width="640" height="480"></canvas>
           </div>
-          <button onClick={switchCamera}>Switch Camera</button>
-          <a href="/">Back</a>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <button onClick={switchCamera}>Switch Camera</button>
+            <a href="/">Back</a>
+          </div>
         </div>
       )}
     </div>

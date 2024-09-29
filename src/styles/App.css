@@ -1,34 +1,28 @@
-.App {
-  text-align: center;
-  margin: 20px;
+.video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  max-width: 640px; /* Max width for larger screens */
+  margin: auto; /* Center the container */
 }
 
-img {
-  margin-top: 20px;
-  border-radius: 8px;
+video,
+canvas {
+  width: 100%; /* Make the video and canvas take full width */
+  height: auto; /* Maintain aspect ratio */
+}
+
+h2, p {
+  text-align: center; /* Center text for better aesthetics */
 }
 
 button {
   margin: 10px;
-  padding: 8px 16px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
   cursor: pointer;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  margin: 5px 0;
 }
 .video-container {
   position: relative; /* Set relative positioning for the container */
@@ -38,8 +32,8 @@ li {
 }
 
 video {
-  width: 640px; /* Set video width */
-  height: 480px; /* Set video height */
+  width: 100%;  /* Set video width */
+  height: auto; /* Set video height */
 }
 
 canvas {
