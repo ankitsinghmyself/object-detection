@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import * as tf from "@tensorflow/tfjs";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import "../styles/App.css";
+
 const ObjectDetector = () => {
   const [model, setModel] = useState(null);
-  const [isStarted, setIsStarted] = useState(false); // State to track if the app has started
+  const [isStarted, setIsStarted] = useState(false);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const spokenObjects = useRef(new Set());
+  const [detectedObjects, setDetectedObjects] = useState([]); // State to store detected object names
 
   useEffect(() => {
     const loadModel = async () => {
@@ -16,7 +18,6 @@ const ObjectDetector = () => {
       setModel(loadedModel);
     };
 
-    // Load the model on initial render
     loadModel();
 
     return () => {
@@ -58,33 +59,32 @@ const ObjectDetector = () => {
     const ctx = canvasRef.current.getContext("2d");
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-    const videoWidth = videoRef.current.videoWidth || 640; // Fallback if not loaded
-    const videoHeight = videoRef.current.videoHeight || 480; // Fallback if not loaded
+    const videoWidth = videoRef.current.videoWidth || 640;
+    const videoHeight = videoRef.current.videoHeight || 480;
 
-    // Set the canvas size to match video size
     canvasRef.current.width = videoWidth;
     canvasRef.current.height = videoHeight;
 
-    // Create a new set to track spoken objects for this detection cycle
     const currentSpokenObjects = new Set();
+    const objectNames = []; // Array to store detected object names
 
     predictions.forEach((prediction) => {
       const [x, y, width, height] = prediction.bbox;
 
-      // Draw the bounding box
       ctx.beginPath();
-      ctx.rect(x, y, width, height); // Use original coordinates as canvas matches video
+      ctx.rect(x, y, width, height);
       ctx.lineWidth = 2;
       ctx.strokeStyle = "red";
       ctx.fillStyle = "red";
       ctx.stroke();
       ctx.fillText(prediction.class, x, y > 10 ? y - 5 : 10);
 
-      // Add the predicted class to current spoken objects
       currentSpokenObjects.add(prediction.class);
+      objectNames.push(prediction.class); // Add detected object name to the array
     });
 
-    // Speak objects that haven't been spoken in this cycle
+    setDetectedObjects(objectNames); // Update state with all detected object names
+
     currentSpokenObjects.forEach((obj) => speak(obj));
   };
 
@@ -97,21 +97,19 @@ const ObjectDetector = () => {
   const speak = (text) => {
     text = `There is a ${text}`;
     if (!spokenObjects.current.has(text)) {
-      spokenObjects.current.add(text); // Mark this object as spoken
+      spokenObjects.current.add(text);
 
       if (window.speechSynthesis) {
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "en-US"; // Set language
+        utterance.lang = "en-US";
 
-        // Check if speech synthesis is supported
         if (!window.speechSynthesis.speaking) {
           window.speechSynthesis.speak(utterance);
         }
 
-        // Optionally, reset spoken objects after a certain duration
         setTimeout(() => {
           spokenObjects.current.delete(text);
-        }, 5000); // Wait for 5 seconds before allowing it to be spoken again
+        }, 5000);
       }
     }
   };
@@ -146,6 +144,18 @@ const ObjectDetector = () => {
       ) : (
         <div>
           <h2>Object Detection in Progress</h2>
+          <div  style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+            <h3>Detected Objects:</h3>
+            <ul>
+              {detectedObjects.map((obj, index) => (
+                <li key={index}>{obj}</li> // Display all detected object names
+              ))}
+            </ul>
+          </div>
           <div className="video-container">
             <video
               ref={videoRef}
