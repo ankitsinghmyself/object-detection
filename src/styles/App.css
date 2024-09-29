@@ -43,3 +43,18 @@ canvas {
   pointer-events: none; /* Allow clicks to pass through to the video */
   border: 1px solid transparent; /* Optional: visible border for debugging */
 }
+
+.responsive-image-container {
+  display: flex;
+  justify-content: center; /* Center the image horizontally */
+  align-items: center; /* Center the image vertically */
+  overflow: hidden; /* Hide overflow if necessary */
+  max-width: 100%; /* Limit the container width */
+  width: 30%;
+}
+
+.responsive-image {
+  max-width: 100%; /* Make the image responsive */
+  height: auto; /* Maintain aspect ratio */
+  display: block; /* Remove inline spacing */
+}

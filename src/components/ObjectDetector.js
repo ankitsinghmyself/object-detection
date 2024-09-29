@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as tf from "@tensorflow/tfjs";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
-import "../styles/App.css";
 
 const ObjectDetector = () => {
   const [model, setModel] = useState(null);
@@ -136,14 +135,19 @@ const ObjectDetector = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              flexDirection: "column",
             }}
           >
             <button onClick={handleStart}>Start Detection</button>
+             
+          <div className="responsive-image-container">
+    <img src="/img/imgAi.webp" alt="Home Image AI" className="responsive-image" />
+</div>
           </div>
+         
         </div>
       ) : (
         <div>
-          <h2>Object Detection in Progress</h2>
           <div  style={{
               display: "flex",
               alignItems: "center",
@@ -152,19 +156,9 @@ const ObjectDetector = () => {
             <h3>Detected Objects:</h3>
             <ul>
               {detectedObjects.map((obj, index) => (
-                <li key={index}>{obj}</li> // Display all detected object names
+                <li key={index}>{obj}</li> 
               ))}
             </ul>
-          </div>
-          <div className="video-container">
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              width="640"
-              height="480"
-            ></video>
-            <canvas ref={canvasRef} width="640" height="480"></canvas>
           </div>
           <div
             style={{
@@ -176,6 +170,17 @@ const ObjectDetector = () => {
             <button onClick={switchCamera}>Switch Camera</button>
             <a href="/">Back</a>
           </div>
+          <div className="video-container">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              width="640"
+              height="480"
+            ></video>
+            <canvas ref={canvasRef} width="640" height="480"></canvas>
+          </div>
+         
         </div>
       )}
     </div>
