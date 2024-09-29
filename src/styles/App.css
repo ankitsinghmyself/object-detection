@@ -1,0 +1,51 @@
+.App {
+  text-align: center;
+  margin: 20px;
+}
+
+img {
+  margin-top: 20px;
+  border-radius: 8px;
+}
+
+button {
+  margin: 10px;
+  padding: 8px 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin: 5px 0;
+}
+.video-container {
+  position: relative; /* Set relative positioning for the container */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+video {
+  width: 640px; /* Set video width */
+  height: 480px; /* Set video height */
+}
+
+canvas {
+  position: absolute; /* Position canvas on top of video */
+  top: 0; /* Align to the top */
+  left: 50; /* Align to the left */
+  pointer-events: none; /* Allow clicks to pass through to the video */
+  border: 1px solid transparent; /* Optional: visible border for debugging */
+}
