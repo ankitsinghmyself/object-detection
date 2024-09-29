@@ -50,7 +50,7 @@ canvas {
   align-items: center; /* Center the image vertically */
   overflow: hidden; /* Hide overflow if necessary */
   max-width: 100%; /* Limit the container width */
-  width: 30%;
+  width: 100%;
 }
 
 .responsive-image {
