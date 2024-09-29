@@ -4,18 +4,18 @@
   align-items: center;
   flex-direction: column;
   width: 100%;
-  max-width: 640px; /* Max width for larger screens */
-  margin: auto; /* Center the container */
+  max-width: 640px;
+  margin: auto;
 }
-
 video,
 canvas {
-  width: 100%; /* Make the video and canvas take full width */
-  height: auto; /* Maintain aspect ratio */
+  width: 100%;
+  height: auto;
 }
 
-h2, p {
-  text-align: center; /* Center text for better aesthetics */
+h2,
+p {
+  text-align: center;
 }
 
 button {
@@ -25,36 +25,36 @@ button {
   cursor: pointer;
 }
 .video-container {
-  position: relative; /* Set relative positioning for the container */
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 video {
-  width: 100%;  /* Set video width */
-  height: auto; /* Set video height */
+  width: 100%;
+  height: auto;
 }
 
 canvas {
-  position: absolute; /* Position canvas on top of video */
-  top: 0; /* Align to the top */
-  left: 50; /* Align to the left */
-  pointer-events: none; /* Allow clicks to pass through to the video */
-  border: 1px solid transparent; /* Optional: visible border for debugging */
+  position: absolute;
+  top: 0;
+  left: 50;
+  pointer-events: none;
+  border: 1px solid transparent;
 }
 
 .responsive-image-container {
   display: flex;
-  justify-content: center; /* Center the image horizontally */
-  align-items: center; /* Center the image vertically */
-  overflow: hidden; /* Hide overflow if necessary */
-  max-width: 100%; /* Limit the container width */
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  max-width: 100%;
   width: 100%;
 }
 
 .responsive-image {
-  max-width: 100%; /* Make the image responsive */
-  height: auto; /* Maintain aspect ratio */
-  display: block; /* Remove inline spacing */
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
