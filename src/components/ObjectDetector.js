@@ -57,35 +57,84 @@ const ObjectDetector = () => {
   const drawPredictions = (predictions) => {
     const ctx = canvasRef.current.getContext("2d");
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-
+  
     const videoWidth = videoRef.current.videoWidth || 640;
     const videoHeight = videoRef.current.videoHeight || 480;
-
+  
     canvasRef.current.width = videoWidth;
     canvasRef.current.height = videoHeight;
-
+  
     const currentSpokenObjects = new Set();
     const objectNames = []; // Array to store detected object names
-
+  
     predictions.forEach((prediction) => {
       const [x, y, width, height] = prediction.bbox;
-
+    
+      // Rounded rectangles with shadow for a sleek look
       ctx.beginPath();
-      ctx.rect(x, y, width, height);
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "red";
-      ctx.fillStyle = "red";
+      ctx.roundRect(x, y, width, height, 10); // Using roundRect for rounded corners
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#00ddff"; // Slightly transparent blue
+      ctx.shadowColor = "rgba(0, 0, 0, 0.5)"; // Add shadow for AI feel
+      ctx.shadowBlur = 10;
       ctx.stroke();
-      ctx.fillText(prediction.class, x, y > 10 ? y - 5 : 10);
-
+      
+      // Add extra bold corners
+      const cornerRadius = 10;
+      const cornerLineWidth = 6; // Thicker lines for corners
+      ctx.lineWidth = cornerLineWidth;
+      
+      // Top-left corner
+      ctx.beginPath();
+      ctx.moveTo(x, y + cornerRadius);
+      ctx.lineTo(x, y);
+      ctx.lineTo(x + cornerRadius, y);
+      ctx.stroke();
+      
+      // Top-right corner
+      ctx.beginPath();
+      ctx.moveTo(x + width - cornerRadius, y);
+      ctx.lineTo(x + width, y);
+      ctx.lineTo(x + width, y + cornerRadius);
+      ctx.stroke();
+      
+      // Bottom-left corner
+      ctx.beginPath();
+      ctx.moveTo(x, y + height - cornerRadius);
+      ctx.lineTo(x, y + height);
+      ctx.lineTo(x + cornerRadius, y + height);
+      ctx.stroke();
+      
+      // Bottom-right corner
+      ctx.beginPath();
+      ctx.moveTo(x + width - cornerRadius, y + height);
+      ctx.lineTo(x + width, y + height);
+      ctx.lineTo(x + width, y + height - cornerRadius);
+      ctx.stroke();
+    
+      // Text for object name
+      ctx.font = "16px 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; // White text with transparency
+      ctx.textBaseline = "top";
+      ctx.fillText(prediction.class, x + 5, y > 10 ? y - 20 : 10); // Slightly above the box
+    
+      // Text background for better readability
+      const textWidth = ctx.measureText(prediction.class).width;
+      ctx.fillStyle = "rgba(0, 0, 0, 0.6)"; // Semi-transparent black background
+      ctx.fillRect(x, y > 10 ? y - 20 : 10, textWidth + 10, 20); // Draw behind text
+      ctx.fillStyle = "rgba(255, 255, 255, 0.9)"; // White text on top of background
+      ctx.fillText(prediction.class, x + 5, y > 10 ? y - 20 : 10);
+    
       currentSpokenObjects.add(prediction.class);
       objectNames.push(prediction.class); // Add detected object name to the array
     });
-
+    
+  
     setDetectedObjects(objectNames); // Update state with all detected object names
-
+  
     currentSpokenObjects.forEach((obj) => speak(obj));
   };
+  
 
   const handleStart = () => {
     setIsStarted(true);
